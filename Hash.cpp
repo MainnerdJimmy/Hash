@@ -4,6 +4,7 @@ HashTable::HashTable()
 {
     H_Table = new Items * [H_Size];
 
+    // std::fill
     for (size_t i=0; i<H_Size; i++)
     {
         H_Table[i]=nullptr;
@@ -20,6 +21,7 @@ HashTable::~HashTable()
 //todo: Сделать свой вариант
 void HashTable::swap(HashTable & b)
 {
+    // ??????
     std::swap(H_Table, b.H_Table);
 }
 
@@ -55,6 +57,23 @@ HashTable::HashTable(const HashTable & b) : HashTable()
             }
         }
     }
+}
+
+//Hash is provided by degrees of 3 and char position
+int HashTable::getHash(const Key & key) const
+{
+    int result = 0;
+
+    for (int i = 0; i < key.length(); i++)
+    {
+        int tmp=1;
+        for (int j=0; j < i; j++) {
+            tmp*=3;
+        }
+        result += key[i] * tmp;
+    }
+
+    return result % H_Size;
 }
 
 HashTable & HashTable::operator=(const HashTable & b)
@@ -101,6 +120,7 @@ HashTable & HashTable::operator=(const HashTable & b)
 
 }
 
+//In order to clear the table, every chain that is not empty is being cleared
 void HashTable::clear()
 {
     for (size_t i=0; i<H_Size; i++)
@@ -120,11 +140,12 @@ void HashTable::clear()
                 item = next;
             }
 
-            H_Table[i]==nullptr;
+            H_Table[i]=nullptr;
         }
     }
 }
 
+//This function cuts the element out of the chain, then reconnects it.
 bool HashTable::erase(const Key & k)
 {
     int keyHash = getHash(k);
@@ -174,7 +195,6 @@ bool HashTable::erase(const Key & k)
     }
 }
 
-//todo: Необходимо разобраться с переполнением.
 bool HashTable::insert(const Key & k, const Value & v)
 {
     Items * newItem = new Items;
@@ -251,6 +271,7 @@ Value & HashTable::operator[](const Key & k)
     {
         Items * item = H_Table[keyHash];
 
+        //We have to put new item at the very end of our chain
         while (true)
         {
             if (item->key == k)
@@ -286,6 +307,7 @@ Value & HashTable::at(const Key & k)
     {
         Items * item = H_Table[keyHash];
 
+        //Until chain with this hash adres ends
         while (true)
         {
             if (item->key == k)
@@ -403,12 +425,3 @@ bool HashTable::operator!=(const HashTable & other) const
     return !(*this == other);
 }
 
-int HashTable::getHash(const Key & key) const
-{
-    int result = 0;
-    for (int i = 0; i < key.length(); i++)
-    {
-        result += key[i];
-    }
-    return result % H_Size;
-}
